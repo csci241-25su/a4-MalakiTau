@@ -22,6 +22,10 @@ public class ShortestPaths {
     // stores auxiliary data associated with each node for the shortest
     // paths computation:
     private HashMap<Node,PathData> paths;
+    private Heap<Node,Integer> frontier;
+    private HashMap<Node, Integer> frontierh;
+    private Heap<Node, Integer> settled;
+    private HashMap<Node, Integer> settledh;
 
     /** Compute the shortest path to all nodes from origin using Dijkstra's
      * algorithm. Fill in the paths field, which associates each Node with its
@@ -29,11 +33,31 @@ public class ShortestPaths {
      * backpointer to the previous node on the shortest path.
      * Precondition: origin is a node in the Graph.*/
     public void compute(Node origin) {
-        paths = new HashMap<Node,PathData>();
-
-        // TODO 1: implement Dijkstra's algorithm to fill paths with
-        // shortest-path data for each Node reachable from origin.
-
+        paths = new HashMap<Node, PathData>();
+        frontier = new Heap<Node, Integer>();
+        frontierh = new HashMap<Node, Integer>();
+        settled = new Heap<Node, Integer>();
+        settledh = new HashMap<Node, Integer>();
+        frontier.add(origin, 0);
+        frontierh.put(origin, 0);
+        paths.put(origin, new PathData(0, null));
+        while(frontier.size>0){
+            Node f = frontier.peek();
+            frontier.poll();
+            frontierh.remove(f);
+            settled.add(f, paths.get(f).distance);
+            settledh.put(f, paths.get(f).distance);
+            for(int i=0;i<f.getNeighbors().keySet().size();i++){
+                Node w = f.getNeighbors().keySet().toArray()[i];
+                if(!frontierh.containsKey(w) && !settledh.containsKey(w)){
+                    paths.put(w, new PathData(paths.get(f).distance+f.getNeighbors().get(w), f));
+                    frontier.add(w, paths.get(w).distance);
+                }
+                else if(paths.get(w).distance + f.getNeighbors().get(w) < paths.get(w).distance){
+                    paths.put(w, new PathData(paths.get(f).distance+f.getNeighbors().get(w), f));
+                }
+            }
+        }
     }
 
     /** Returns the length of the shortest path from the origin to destination.
@@ -41,9 +65,12 @@ public class ShortestPaths {
      * Precondition: destination is a node in the graph, and compute(origin)
      * has been called. */
     public double shortestPathLength(Node destination) {
-        // TODO 2 - implement this method to fetch the shortest path length
-        // from the paths data computed by Dijkstra's algorithm.
-        throw new UnsupportedOperationException();
+        if(paths.containsKey(destination)){
+            return paths.get(destination).distance;
+        }
+        else{
+            return Double.POSITIVE_INFINITY;
+        }
     }
 
     /** Returns a LinkedList of the nodes along the shortest path from origin
@@ -52,13 +79,25 @@ public class ShortestPaths {
      * If no path to it exists, return null.
      * Precondition: destination is a node in the graph, and compute(origin)
      * has been called. */
+    private LinkedList<Node> answer;
     public LinkedList<Node> shortestPath(Node destination) {
-        // TODO 3 - implement this method to reconstruct sequence of Nodes
-        // along the shortest path from the origin to destination using the
-        // paths data computed by Dijkstra's algorithm.
-        throw new UnsupportedOperationException();
+        if(!paths.containsKey(destination)){
+            return null;
+        }
+        else{
+            answer = new LinkedList<Node>();
+            return traversal(destination);
+        }
     }
-
+    public LinkedList<Node> traversal(Node travel){
+        answer.addFirst(travel);
+        if(paths.get(travel).distance==0){
+            return answer;
+        }
+        else{
+            return traversal(paths.get(travel).previous);
+        }
+    }
 
     /** Inner class representing data used by Dijkstra's algorithm in the
      * process of computing shortest paths from a given source node. */
@@ -121,14 +160,33 @@ public class ShortestPaths {
 
       // TODO 4: create a ShortestPaths object, use it to compute shortest
       // paths data from the origin node given by origCode.
-
+      ShortestPaths sp = new ShortestPaths();
+      Node origin = graph.getNode(origCode);
+      sp.compute(origin);
       // TODO 5:
       // If destCode was not given, print each reachable node followed by the
       // length of the shortest path to it from the origin.
-
+      if(destCode!=null){
+        for(int i=0;i<graph.getNodes().keySet().toArray().length;i++){
+            System.out.println("Node: " + graph.getNodes().keySet().toArray()[i]);
+            System.out.println(sp.shortestPathLength(graph.getNode(graph.getNodes().keySet().toArray()[i])));
+        }
+      }
       // TODO 6:
       // If destCode was given, print the nodes in the path from
       // origCode to destCode, followed by the total path length
       // If no path exists, print a message saying so.
+      else{
+        LinkedList<Node> Path = sp.shortestPath(graph.getNode(destCode));
+        if(Path==null){
+            System.out.println("No path exists");
+        }
+        else{
+            for(int i=0;i<Path.size();i++){
+                System.out.println(Path.get(i));
+            }
+            System.out.println("The length of the path from destCode to origin is "+sp.shortestPathLength(graph.getNode(destCode)));
+        }
+      }
     }
 }
