@@ -1,3 +1,6 @@
+///Name: Malaki-Jacob Taub
+///Date: 7/30/2025
+///Description: Contains the main function, along with its helpers to determine the shortest path from one node to another in a graph.
 package graph;
 
 import heap.Heap;
@@ -22,10 +25,10 @@ public class ShortestPaths {
     // stores auxiliary data associated with each node for the shortest
     // paths computation:
     private HashMap<Node,PathData> paths;
-    private Heap<Node,Integer> frontier;
-    private HashMap<Node, Integer> frontierh;
-    private Heap<Node, Integer> settled;
-    private HashMap<Node, Integer> settledh;
+    private Heap<Node,Double> frontier;
+    private HashMap<Node, Double> frontierh;
+    private Heap<Node, Double> settled;
+    private HashMap<Node, Double> settledh;
 
     /** Compute the shortest path to all nodes from origin using Dijkstra's
      * algorithm. Fill in the paths field, which associates each Node with its
@@ -34,21 +37,24 @@ public class ShortestPaths {
      * Precondition: origin is a node in the Graph.*/
     public void compute(Node origin) {
         paths = new HashMap<Node, PathData>();
-        frontier = new Heap<Node, Integer>();
-        frontierh = new HashMap<Node, Integer>();
-        settled = new Heap<Node, Integer>();
-        settledh = new HashMap<Node, Integer>();
-        frontier.add(origin, 0);
-        frontierh.put(origin, 0);
+        // Creating Frontier and Settled
+        frontier = new Heap<Node, Double>();
+        frontierh = new HashMap<Node, Double>();
+        settled = new Heap<Node, Double>();
+        settledh = new HashMap<Node, Double>();
+        // Adding Origin to Frontier
+        frontier.add(origin, 0.0);
+        frontierh.put(origin, 0.0);
         paths.put(origin, new PathData(0, null));
-        while(frontier.size>0){
+        while(frontier.size()>0){
+            // Removing frontier's first value and putting it in settled
             Node f = frontier.peek();
             frontier.poll();
             frontierh.remove(f);
             settled.add(f, paths.get(f).distance);
             settledh.put(f, paths.get(f).distance);
-            for(int i=0;i<f.getNeighbors().keySet().size();i++){
-                Node w = f.getNeighbors().keySet().toArray()[i];
+            // Scanning current node's neighbors
+            for(Node w : f.getNeighbors().keySet()){
                 if(!frontierh.containsKey(w) && !settledh.containsKey(w)){
                     paths.put(w, new PathData(paths.get(f).distance+f.getNeighbors().get(w), f));
                     frontier.add(w, paths.get(w).distance);
@@ -65,6 +71,7 @@ public class ShortestPaths {
      * Precondition: destination is a node in the graph, and compute(origin)
      * has been called. */
     public double shortestPathLength(Node destination) {
+        // Getting the length of the shortest path is easy, as all d values are already stored in the hashMap made in compute().
         if(paths.containsKey(destination)){
             return paths.get(destination).distance;
         }
@@ -89,6 +96,7 @@ public class ShortestPaths {
             return traversal(destination);
         }
     }
+    /*Recursively creates a Linked List of Nodes from each backpointer visited.*/
     public LinkedList<Node> traversal(Node travel){
         answer.addFirst(travel);
         if(paths.get(travel).distance==0){
@@ -166,10 +174,11 @@ public class ShortestPaths {
       // TODO 5:
       // If destCode was not given, print each reachable node followed by the
       // length of the shortest path to it from the origin.
-      if(destCode!=null){
-        for(int i=0;i<graph.getNodes().keySet().toArray().length;i++){
-            System.out.println("Node: " + graph.getNodes().keySet().toArray()[i]);
-            System.out.println(sp.shortestPathLength(graph.getNode(graph.getNodes().keySet().toArray()[i])));
+      if(destCode==null){
+        
+        for(String nodeString : graph.getNodes().keySet()){
+            System.out.println("Node: " + nodeString);
+            System.out.println("Shortest Path Length: " + sp.shortestPathLength(graph.getNode(nodeString)));
         }
       }
       // TODO 6:

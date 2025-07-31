@@ -1,4 +1,5 @@
 package heap;
+import java.util.HashMap;
 ///Name: Malaki-Jacob Taub
 ///Date: 7/21/2025
 ///Description: Contains the needed functions for the heap itself.
@@ -38,12 +39,12 @@ public final class Heap<V, P extends Comparable<P>> {
      *        the index of v in c. Thus: map.get(c[i]) = i.
      */
     protected AList<Entry> c;
-    protected HashTable<V, Integer> map;
+    protected HashMap<V, Integer> map;
 
     /** Constructor: an empty heap with capacity 10. */
     public Heap() {
         c = new AList<Entry>(10);
-        map = new HashTable<V, Integer>();
+        map = new HashMap<V, Integer>();
     }
 
     /** An Entry contains a value and a priority. */
