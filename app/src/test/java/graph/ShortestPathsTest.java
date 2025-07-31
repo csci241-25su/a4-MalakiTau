@@ -1,3 +1,6 @@
+///Name: Malaki-Jacob Taub
+///Date: 7/30/2025
+///Description: Tests the Shortest Path methods
 package graph;
 
 import static org.junit.Assert.*;
@@ -64,6 +67,34 @@ public class ShortestPathsTest {
         assertEquals(abPath.getFirst(), a);
         assertEquals(abPath.getLast(),  b);
         assertEquals(sp.shortestPathLength(b), 1.0, 1e-6);
+    }
+
+    /*Test case to check if the event that shortestPath comes up null is possible.*/
+    @Test
+    public void test02NoPathExists(){
+        Graph g = loadBasicGraph("FakeCanada.txt");
+        g.report();
+        ShortestPaths sp = new ShortestPaths();
+        Node a = g.getNode("YUL");
+        sp.compute(a);
+        Node b = new Node("A");
+        LinkedList<Node> abPath = sp.shortestPath(b);
+        assertEquals(abPath, null);
+    }
+
+    /*Testing the algorithm with a custom graph made by me.*/
+    @Test
+    public void test03CustomGraph(){
+        Graph g = loadBasicGraph("CustomGraph.txt");
+        g.report();
+        ShortestPaths sp = new ShortestPaths();
+        Node a = g.getNode("A");
+        sp.compute(a);
+        Node b = g.getNode("B");
+        LinkedList<Node> abPath = sp.shortestPath(b);
+        assertEquals(abPath.getFirst(), a);
+        assertEquals(abPath.getLast(),  b);
+        assertEquals(sp.shortestPathLength(b), 10.0, 1e-6);
     }
 
     /* Pro tip: unless you include @Test on the line above your method header,
