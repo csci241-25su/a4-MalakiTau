@@ -177,8 +177,11 @@ public class ShortestPaths {
       if(destCode==null){
         
         for(String nodeString : graph.getNodes().keySet()){
-            System.out.println("Node: " + nodeString);
-            System.out.println("Shortest Path Length: " + sp.shortestPathLength(graph.getNode(nodeString)));
+            double pathLength = sp.shortestPathLength(graph.getNode(nodeString));
+            if(pathLength != Double.POSITIVE_INFINITY){
+                System.out.println("Node: " + nodeString);
+                System.out.println("Shortest Path Length: " + pathLength);
+            }
         }
       }
       // TODO 6:
